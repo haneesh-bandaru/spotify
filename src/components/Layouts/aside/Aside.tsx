@@ -10,7 +10,7 @@ import {
   Search,
 } from "lucide-react";
 import spotifyLogo from "../../../assets/spotify.png";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 
 type sideItemsType = {
   text: string;
