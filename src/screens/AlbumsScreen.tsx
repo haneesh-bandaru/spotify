@@ -1,7 +1,8 @@
+import DisplaySong from "@/components/DisplaySong";
 import API from "@/services/API";
-import { Dot, Heart, Menu, Play } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Dot, Heart, Menu, Play } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type Song = {
   "Song Name": string;
@@ -15,10 +16,12 @@ type AlbumData = {
   Genre: string;
   Language: string;
   Songs: Song[];
+  AlbumImage: string;
 };
 
 const AlbumsScreen = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [songs, setSongs] = useState<Song[]>([]);
   const [albumData, setAlbumData] = useState<AlbumData | null>(null);
@@ -30,6 +33,8 @@ const AlbumsScreen = () => {
         const album: AlbumData = response.data[0];
         setAlbumData(album);
         setSongs(album.Songs);
+        console.log(album);
+
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching songs:", error);
@@ -41,60 +46,73 @@ const AlbumsScreen = () => {
   }, [location.state]);
 
   return (
-    <div className="bg-[#121212] w-full mt-2 mr-2 rounded-2xl">
+    <div className="bg-[#121212] w-full my-2 mr-2">
       {!isLoading ? (
-        <div className="bg-[#212121] text-white">
-          {albumData && (
-            <div className="flex items-center ">
-              <div className="flex text-8xl">
-                <img
-                  src={`https://avatar.iran.liara.run/username?username=${albumData["Album Name"]}`}
-                  height={150}
-                  width={150}
-                  alt="No way!"
-                  className=" rounded-full object-cover"
-                />
-              </div>
-              <div className="">
-                <p className="text-8xl ">{albumData["Album Name"]}</p>
-                <div className="flex mt-4">
-                  <p>{albumData?.["Artist Name"]}</p>
-                  <Dot />
-                  <p>{albumData.Genre}</p>
-                  <Dot />
+        <div className="relative bg-[#212121] h-full text-white rounded-xl ">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: albumData
+                ? `url(${albumData.AlbumImage})`
+                : "none",
+              filter: "brightness(50%) blur(10px)",
+            }}
+          ></div>
+          <div
+            className="relative pt-4 pl-5 w-fit min-h-10 max-h-10 group cursor-pointer"
+            onClick={() => {
+              navigate("/home");
+            }}
+          >
+            <ChevronLeft className="bg-[#121212] rounded-full p-1 group-hover:hidden" />
+            <ArrowLeft className="bg-[#121212] rounded-full p-1 group-hover:block hidden" />
+          </div>
 
-                  <p>Language: {albumData.Language}</p>
-                  <Dot />
-                  <p>{songs.length} songs</p>
+          <div className="relative pt-14">
+            {albumData && (
+              <div className="flex items-center pl-20 gap-10">
+                <div className="flex text-8xl">
+                  <img
+                    src={albumData.AlbumImage}
+                    height={150}
+                    width={150}
+                    alt=""
+                    className="rounded-full object-cover"
+                  />
+                </div>
+                <div>
+                  <p className="text-8xl">{albumData["Album Name"]}</p>
+                  <div className="flex mt-3">
+                    <p>{albumData["Artist Name"]}</p>
+                    <Dot />
+                    <p>{albumData.Genre}</p>
+                    <Dot />
+                    <p>Language: {albumData.Language}</p>
+                    <Dot />
+                    <p>{songs.length} songs</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          <div className="flex justify-between ml-6">
-            <div className="flex gap-10">
-              <div className="bg-primary text-black rounded-full w-[24px] h-[24px] p-1">
-                <Play size={24} />
+            )}
+            <div className="relative flex justify-between ml-6">
+              <div className="flex gap-10 pt-6">
+                <div className="bg-primary text-black rounded-full w-[24px] h-[24px] p-1">
+                  <Play size={24} />
+                </div>
+                <div className="text-gray-400 rounded-full w-[24px] h-[24px] p-1">
+                  <Heart size={24} />
+                </div>
               </div>
-              <div className=" text-gray-400 rounded-full w-[24px] h-[24px] p-1">
-                <Heart size={24} />
+              <div className="flex items-center gap-2 text-gray-400">
+                Compact <Menu />
               </div>
             </div>
-            <div className="flex items-center gap-2 text-gray-400">
-              Compact <Menu />
+            <div className="relative bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 ">
+              {songs.map((song, index) => (
+                <DisplaySong song={song} index={index} />
+              ))}
             </div>
           </div>
-          {songs.map((song, index) => (
-            <div key={index} className="flex justify-between p-4">
-              <div className="flex gap-4 ">
-                <p>{index + 1}</p>
-                <p className="font-bold">{song["Song Name"]}</p>
-              </div>
-              <p>
-                {Math.floor(song.Duration / 60)}:{" "}
-                {song.Duration / 60 - song.Duration / 60}
-              </p>
-            </div>
-          ))}
         </div>
       ) : (
         <>Loading...</>

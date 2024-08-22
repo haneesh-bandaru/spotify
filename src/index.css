@@ -8,20 +8,17 @@
   user-select: none;
 }
 
+/* Customize the scrollbar track */
 ::-webkit-scrollbar {
-  width: 1px; /* Width of the entire scrollbar */
+  width: 1px; /* Width of the vertical scrollbar */
+  height: 4px; /* Height of the horizontal scrollbar */
+  border-radius: 10px;
 }
 
-/* Customize scrollbar thumb */
+/* Customize the scrollbar thumb */
 ::-webkit-scrollbar-thumb {
   background-color: gray; /* Color of the scrollbar thumb */
-  width: 1px;
   border-radius: 1px; /* Rounded corners of the thumb */
-}
-
-/* Customize scrollbar track on hover */
-::-webkit-scrollbar-track:hover {
-  /* background-color: ; Color of the scrollbar track on hover */
 }
 
 @layer base {

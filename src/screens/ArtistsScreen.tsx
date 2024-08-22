@@ -1,6 +1,7 @@
 import API from "@/services/API";
+import { ArrowLeft, ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface Track {
   Track_ID: string;
@@ -14,7 +15,7 @@ interface Album {
   AlbumName: string;
   Release_Date: string;
   Language: string;
-  Album_Image: string | null;
+  AlbumImage: string | null;
   Tracks: Track[];
 }
 
@@ -33,6 +34,7 @@ interface ApiResponse {
 
 const ArtistsScreen = () => {
   const location = useLocation();
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [artistsData, setArtistsData] = useState<Artist[] | null>(null);
 
@@ -64,9 +66,18 @@ const ArtistsScreen = () => {
 
   return (
     <div className="text-white overflow-scroll w-full">
+      <div
+        className="relative pt-4 pl-5 w-fit min-h-10 max-h-10 group cursor-pointer"
+        onClick={() => {
+          navigate("/home");
+        }}
+      >
+        <ChevronLeft className="bg-[#121212] rounded-full p-1 group-hover:hidden" />
+        <ArrowLeft className="bg-[#121212] rounded-full p-1 group-hover:block hidden" />
+      </div>
       {artistsData.map((artist) => (
         <div key={artist.Artist_ID}>
-          <div className="flex items-center m-8">
+          <div className=" flex items-center m-8 w-screen">
             <img
               src={`https://avatar.iran.liara.run/public?username=${artist.ArtistName}`}
               height={160}
@@ -83,11 +94,11 @@ const ArtistsScreen = () => {
                 <h2>{album.AlbumName}</h2>
                 {/* <p>{new Date(album.Release_Date).toLocaleDateString()}</p> */}
               </div>
-              {album.Album_Image && (
+              {/* {album.Album_Image && (
                 <img src={album.Album_Image} alt={album.AlbumName} />
-              )}
+              )} */}
               {album.Tracks.map((track, index) => (
-                <p
+                <div
                   key={track.Track_ID}
                   className="flex gap-10 bg-[#212121] mt-2 py-4 px-4 justify-between rounded-lg"
                 >
@@ -95,7 +106,7 @@ const ArtistsScreen = () => {
                     {index + 1} . {track.trackName}
                   </p>
                   <p>Duration: {track.Duration} seconds</p>
-                </p>
+                </div>
               ))}
             </div>
           ))}

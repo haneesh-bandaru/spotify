@@ -3,21 +3,37 @@ import AlbumsCard from "../components/AlbumsCard";
 import API from "@/services/API";
 import ArtistsCard from "../components/ArtistsCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
+import PlaylistsCard from "@/components/PlaylistsCard";
 
-// Define the types for the Album data structure
-interface Album {
+type Album = {
   AlbumId: string;
   AlbumName: string;
   Release_Date: string;
   "Number of Songs": number;
   Duration: string;
-}
+  AlbumImage: string;
+};
 
-interface Artists {
+type Artists = {
   Artist_ID: string;
   Name: string;
   Genre: string;
-}
+};
+
+type Tracks = {
+  Track_ID: string;
+  TrackName: string;
+  Duration: number;
+  Path: string;
+};
+
+type Playlists = {
+  Playlist_ID: string;
+  Playlist_Name: string;
+  Status: string;
+  Tracks: Tracks[];
+};
 
 const ArtistCardSkeleton = () => {
   return (
@@ -43,20 +59,39 @@ const AlbumsCardSkeleton = () => {
   );
 };
 
+const PlaylistsCardSkeleton = () => {
+  return (
+    <div className="p-4 rounded-lg bg-gray-800">
+      <Skeleton className="w-full h-32 object-cover rounded-lg" />
+      <div className="mt-2 space-y-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+    </div>
+  );
+};
+
 const HomeScreen = () => {
+  const navigate = useNavigate();
+
   const [albums, setAlbums] = useState<Album[]>([]);
   const [artists, setArtists] = useState<Artists[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [playlist, setPlaylist] = useState<Playlists[]>([]);
 
-  const song = "https://music.youtube.com/watch?v=JCf7lKL1UQ4&feature=shared";
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const userId = "1c935780-5bad-11ef-a5b2-e454e8a1e2ee" || null;
 
   useEffect(() => {
     API.get.getAlbums().then((response) => {
       setAlbums(response.data.Albums);
-      API.get.getArtists().then((response) => {
-        setArtists(response.data.Artists);
-        setIsLoading(false);
-      });
+    });
+    API.get.getArtists().then((response) => {
+      setArtists(response.data.Artists);
+    });
+    API.get.getPlaylists(userId).then((response) => {
+      console.log(response.data);
+      setPlaylist(response.data);
+      setIsLoading(false);
     });
   }, []);
 
@@ -65,7 +100,14 @@ const HomeScreen = () => {
       <div className="bg-[#212121] w-full mt-2 mr-2 p-4 rounded-lg overflow-x-hidden">
         <div className="flex justify-between mt-6">
           <p className="text-white">Popular Artists</p>
-          <p className="text-gray-400 cursor-pointer">Show all</p>
+          <p
+            className="text-gray-400 cursor-pointer"
+            onClick={() => {
+              navigate("/artists");
+            }}
+          >
+            Show all
+          </p>
         </div>
 
         <div className="flex gap-4 overflow-scroll ">
@@ -89,6 +131,7 @@ const HomeScreen = () => {
           <p className="text-white">Popular Albums</p>
           <p className="text-gray-400 cursor-pointer">Show all</p>
         </div>
+
         <div className="flex gap-2 overflow-x-scroll mt-4">
           {!isLoading ? (
             albums.map((item: Album, index: number) => (
@@ -101,6 +144,29 @@ const HomeScreen = () => {
               {albums.map((item: Album, index: number) => (
                 <div key={index}>
                   <AlbumsCardSkeleton />
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+
+        <div className="flex justify-between mt-6">
+          <p className="text-white">Spotify Playlists</p>
+          <p className="text-gray-400 cursor-pointer">Show all</p>
+        </div>
+
+        <div className="flex gap-2 overflow-x-scroll mt-4">
+          {!isLoading ? (
+            playlist.map((item: Playlists, index: number) => (
+              <div key={index}>
+                <PlaylistsCard item={item} />
+              </div>
+            ))
+          ) : (
+            <>
+              {playlist.map((_, index: number) => (
+                <div key={index}>
+                  <PlaylistsCardSkeleton />
                 </div>
               ))}
             </>

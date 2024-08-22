@@ -62,7 +62,7 @@ const Aside = ({ onLogout }) => {
   const location = useLocation();
 
   return (
-    <div className="p-2 overflow-hidden w-48">
+    <div className="p-2 overflow-hidden max-w-48  min-w-48">
       {/* Logo & Search Part */}
       <div className="bg-[#212121] p-4 rounded-lg w-fit">
         <div className="flex items-center m-2 max-h-10 gap-2">

@@ -41,6 +41,18 @@ export default {
         `${apiUrl}/v1/app/fetch-artist-songs?artistId=${artistId}`
       );
     },
+
+    getPlaylists: (userId: string) => {
+      return axiosInstance.get(
+        `${apiUrl}/v1/app/fetch-playlists?userId=${userId}`
+      );
+    },
+
+    getPlaylistDetails: (playlistId: string) => {
+      return axiosInstance.get(
+        `${apiUrl}/v1/app/fetch-playlist-details?playlistId=${playlistId}`
+      );
+    },
   },
   post: {
     login: (body: any) => {

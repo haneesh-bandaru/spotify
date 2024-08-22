@@ -8,7 +8,6 @@ interface Artists {
 
 const ArtistsCard = ({ item }: Artists) => {
   const navigate = useNavigate();
-
   return (
     <div
       className="flex flex-col mt-4 gap-4 p-4 items-center hover:bg-[#121212] hover:cursor-pointer hover:rounded-lg"
