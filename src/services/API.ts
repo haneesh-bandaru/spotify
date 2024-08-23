@@ -65,6 +65,10 @@ export default {
     signup: (body: any) => {
       return axios.post(`${apiUrl}/signup`, body);
     },
+
+    likeTrack: (body: any) => {
+      return axios.post(`${apiUrl}/v1/app/toggle-like-track`, body);
+    },
   },
   put: {
     fakeProduct: (body: any) => {

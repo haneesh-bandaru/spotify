@@ -11,6 +11,7 @@ import PlaylistScreen from "./screens/PlaylistScreen";
 import SignUpForm from "./screens/SignupScreen";
 import useAuthStore from "./store/store";
 import LikedSongs from "./screens/LikedSongsScreen";
+import Task from "./screens/Task";
 
 const App = () => {
   const { isLoggedIn, setIsLoggedIn } = useAuthStore();
@@ -24,9 +25,11 @@ const App = () => {
 
   return (
     <div className="flex">
+      <Routes></Routes>
       {isLoggedIn ? (
         <Routes>
           <Route path="/" element={<Layout onLogout={handleLogout} />}>
+            <Route path="/task" element={<Task />} />
             <Route path="/home" element={<HomeScreen />} />
             <Route path="*" element={<HomeScreen />} />
             <Route path="/albums/:slug" element={<AlbumsScreen />} />

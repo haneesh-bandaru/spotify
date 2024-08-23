@@ -1,6 +1,25 @@
-import { Play } from "lucide-react";
+import API from "@/services/API";
+import useAuthStore from "@/store/store";
+import { Heart, Play } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const DisplaySong = ({ track, index }) => {
+  const { userId } = useAuthStore();
+
+  const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    const fetchArtistData = async () => {
+      try {
+        const response = await API.post.likeTrack({ userId });
+      } catch (error) {
+        console.error("Error fetching artist data:", error);
+      }
+    };
+
+    fetchArtistData();
+  });
+
   return (
     <div
       key={track.Track_ID}
@@ -11,11 +30,20 @@ const DisplaySong = ({ track, index }) => {
         {index + 1}
         <p className="text-lg">{track.TrackName || track.trackName}</p>
       </div>
-      <p>
-        {Math.floor(track.Duration / 60 || track.duration / 60)}:
-        {(track.Duration % 60).toString().padStart(2, "0") ||
-          (track.duration % 60).toString().padStart(2, "0")}
-      </p>
+      <div className="flex items-center gap-6">
+        <p>
+          {Math.floor(track.Duration / 60 || track.duration / 60)}:
+          {(track.Duration % 60).toString().padStart(2, "0") ||
+            (track.duration % 60).toString().padStart(2, "0")}
+        </p>
+        <p
+          onClick={() => {
+            setIsLiked(!isLiked);
+          }}
+        >
+          {isLiked ? "liked" : <Heart />}
+        </p>
+      </div>
     </div>
   );
 };

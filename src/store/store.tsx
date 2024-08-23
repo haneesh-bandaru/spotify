@@ -1,11 +1,11 @@
 import { create } from "zustand";
 
-interface AuthState {
+type AuthState = {
   isLoggedIn: boolean;
   userId: string | null;
   setIsLoggedIn: (status: boolean) => void;
   setUserId: (id: string | null) => void;
-}
+};
 
 const useAuthStore = create<AuthState>((set) => ({
   isLoggedIn: !!localStorage.getItem("Authorization"),

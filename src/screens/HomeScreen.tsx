@@ -5,6 +5,7 @@ import ArtistsCard from "../components/ArtistsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import PlaylistsCard from "@/components/PlaylistsCard";
+import useAuthStore from "@/store/store";
 
 type Album = {
   AlbumId: string;
@@ -79,7 +80,7 @@ const HomeScreen = () => {
   const [playlist, setPlaylist] = useState<Playlists[]>([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const userId = localStorage.getItem("userId");
+  const { userId } = useAuthStore();
 
   useEffect(() => {
     API.get.getAlbums().then((response) => {
