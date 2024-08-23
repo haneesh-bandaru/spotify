@@ -1,3 +1,5 @@
+import BackButton from "@/components/BackButton";
+import DisplaySong from "@/components/DisplaySong";
 import API from "@/services/API";
 import { ArrowLeft, ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -5,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 interface Track {
   Track_ID: string;
-  trackName: string;
+  TrackName: string;
   Duration: number;
   path: string;
 }
@@ -34,7 +36,7 @@ interface ApiResponse {
 
 const ArtistsScreen = () => {
   const location = useLocation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [artistsData, setArtistsData] = useState<Artist[] | null>(null);
 
@@ -66,15 +68,7 @@ const ArtistsScreen = () => {
 
   return (
     <div className="text-white overflow-scroll w-full">
-      <div
-        className="relative pt-4 pl-5 w-fit min-h-10 max-h-10 group cursor-pointer"
-        onClick={() => {
-          navigate("/home");
-        }}
-      >
-        <ChevronLeft className="bg-[#121212] rounded-full p-1 group-hover:hidden" />
-        <ArrowLeft className="bg-[#121212] rounded-full p-1 group-hover:block hidden" />
-      </div>
+      <BackButton route="/home" />
       {artistsData.map((artist) => (
         <div key={artist.Artist_ID}>
           <div className=" flex items-center m-8 w-screen">
@@ -97,17 +91,11 @@ const ArtistsScreen = () => {
               {/* {album.Album_Image && (
                 <img src={album.Album_Image} alt={album.AlbumName} />
               )} */}
-              {album.Tracks.map((track, index) => (
-                <div
-                  key={track.Track_ID}
-                  className="flex gap-10 bg-[#212121] mt-2 py-4 px-4 justify-between rounded-lg"
-                >
-                  <p>
-                    {index + 1} . {track.trackName}
-                  </p>
-                  <p>Duration: {track.Duration} seconds</p>
-                </div>
-              ))}
+              <div className="relative bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 ">
+                {album.Tracks.map((track, index) => (
+                  <DisplaySong track={track} index={index} />
+                ))}
+              </div>
             </div>
           ))}
         </div>

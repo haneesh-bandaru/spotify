@@ -79,7 +79,7 @@ const HomeScreen = () => {
   const [playlist, setPlaylist] = useState<Playlists[]>([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const userId = "1c935780-5bad-11ef-a5b2-e454e8a1e2ee" || null;
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     API.get.getAlbums().then((response) => {

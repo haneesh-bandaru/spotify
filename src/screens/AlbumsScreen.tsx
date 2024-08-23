@@ -4,8 +4,8 @@ import { ArrowLeft, ChevronLeft, Dot, Heart, Menu, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-type Song = {
-  "Song Name": string;
+type Track = {
+  TrackName: string;
   Duration: number;
   Path: string;
 };
@@ -15,7 +15,7 @@ type AlbumData = {
   "Artist Name": string;
   Genre: string;
   Language: string;
-  Songs: Song[];
+  Tracks: Track[];
   AlbumImage: string;
 };
 
@@ -23,7 +23,7 @@ const AlbumsScreen = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [songs, setSongs] = useState<Song[]>([]);
+  const [songs, setSongs] = useState<Track[]>([]);
   const [albumData, setAlbumData] = useState<AlbumData | null>(null);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const AlbumsScreen = () => {
         const response = await API.get.getSongs(location.state as string);
         const album: AlbumData = response.data[0];
         setAlbumData(album);
-        setSongs(album.Songs);
+        setSongs(album.Tracks);
         console.log(album);
 
         setIsLoading(false);
@@ -109,7 +109,7 @@ const AlbumsScreen = () => {
             </div>
             <div className="relative bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 ">
               {songs.map((song, index) => (
-                <DisplaySong song={song} index={index} />
+                <DisplaySong track={song} index={index} />
               ))}
             </div>
           </div>

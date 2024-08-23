@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import API from "@/services/API";
-import { ArrowLeft, ChevronLeft, Dot, Play } from "lucide-react";
+import { Dot } from "lucide-react";
+import DisplaySong from "@/components/DisplaySong";
+import BackButton from "@/components/BackButton";
 
 type Track = {
   Track_ID: string;
@@ -18,7 +20,6 @@ type PlaylistData = {
 };
 
 const PlaylistsScreen = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [playlists, setPlaylists] = useState<PlaylistData[]>([]);
@@ -47,20 +48,11 @@ const PlaylistsScreen = () => {
     <div className="bg-[#121212] w-full my-2 mr-2 overflow-scroll ">
       {!isLoading ? (
         <div className="relative bg-[#212121] h-full text-white rounded-xl">
-          <div
-            className="relative pt-4 pl-5 w-fit min-h-10 max-h-10 group cursor-pointer"
-            onClick={() => {
-              navigate("/home");
-            }}
-          >
-            <ChevronLeft className="bg-[#121212] rounded-full p-1 group-hover:hidden" />
-            <ArrowLeft className="bg-[#121212] rounded-full p-1 group-hover:block hidden" />
-          </div>
-
+          <BackButton route={"/home"} />
           <div className="relative pt-14">
             {playlists.map((playlist) => (
               <div key={playlist.Playlist_ID} className="mb-10">
-                <div className="flex items-center pl-20 gap-10">
+                <div className="flex items-center pl-10 gap-10">
                   <div>
                     <p className="text-5xl">{playlist.Playlist_Name}</p>
                     <div className="flex mt-3">
@@ -71,22 +63,12 @@ const PlaylistsScreen = () => {
                   </div>
                 </div>
 
-                <div className="ml-20 mt-5">
-                  {playlist.Tracks.map((track) => (
-                    <div
-                      key={track.Track_ID}
-                      className="flex items-center justify-between mb-4 p-2 bg-[#1e1e1e] rounded-lg"
-                    >
-                      <div className="flex items-center gap-4">
-                        <Play className="text-[#1DB954]" />
-                        <p className="text-lg">{track.TrackName}</p>
-                      </div>
-                      <p>
-                        {Math.floor(track.Duration / 60)}:
-                        {(track.Duration % 60).toString().padStart(2, "0")}
-                      </p>
-                    </div>
-                  ))}
+                <div className="ml-5 mt-5">
+                  <div className="relative bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 ">
+                    {playlist.Tracks.map((track, index) => (
+                      <DisplaySong track={track} index={index} />
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}

@@ -114,6 +114,9 @@ const Aside = ({ onLogout }) => {
                       ? "bg-black text-white rounded-full w-fit pr-6"
                       : ""
                   }`}
+                  onClick={() => {
+                    navigate("/liked-songs/1");
+                  }}
                 >
                   <item.icon className="mx-2" size={18} />
                   <p>{item.text}</p>

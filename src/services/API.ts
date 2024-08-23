@@ -6,10 +6,7 @@ const axiosInstance = axios.create();
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    // const token = localStorage.getItem("Authorization");
-    const token: string =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJqb2huZG9lQGV4YW1wbGUuY29tIiwicm9sZSI6InJlZ3VsYXIiLCJpYXQiOjE3MjM4MDY2OTZ9.EWa8cNqaRAE_DaitAqaaR70GaLVIQorX5Vh-O2Ci1N0";
-
+    const token = localStorage.getItem("Authorization");
     if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
@@ -32,13 +29,13 @@ export default {
 
     getSongs: (albumId: string) => {
       return axiosInstance.get(
-        `${apiUrl}/v1/app/fetch-songs?albumId=${albumId}`
+        `${apiUrl}/v1/app/fetch-track?albumId=${albumId}`
       );
     },
 
     getArtistSongs: (artistId: string) => {
       return axiosInstance.get(
-        `${apiUrl}/v1/app/fetch-artist-songs?artistId=${artistId}`
+        `${apiUrl}/v1/app/fetch-artist-track?artistId=${artistId}`
       );
     },
 
@@ -53,10 +50,20 @@ export default {
         `${apiUrl}/v1/app/fetch-playlist-details?playlistId=${playlistId}`
       );
     },
+
+    getLikedSongs: (userId: string) => {
+      return axiosInstance.get(
+        `${apiUrl}/v1/app/fetch-liked-songs?userId=${userId}`
+      );
+    },
   },
   post: {
     login: (body: any) => {
       return axios.post(`${apiUrl}/login`, body);
+    },
+
+    signup: (body: any) => {
+      return axios.post(`${apiUrl}/signup`, body);
     },
   },
   put: {
