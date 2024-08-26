@@ -49,15 +49,13 @@ const Task = () => {
       </div>
       <div className="flex">
         {checkedA.map((checked, i) => (
-          <label key={`A${i + 1}`} className="mr-4">
-            <input
-              type="radio"
-              value={`A${i + 1}`}
-              onClick={() => handleGroupChange(i, checkedA, setCheckedA)}
-              checked={checked}
-            />
-            A{i + 1}
-          </label>
+          <input
+            key={`A${i + 1}`}
+            type="radio"
+            value={`A${i + 1}`}
+            onClick={() => handleGroupChange(i, checkedA, setCheckedA)}
+            checked={checked}
+          />
         ))}
       </div>
 
@@ -72,15 +70,13 @@ const Task = () => {
       </div>
       <div className="flex">
         {checkedB.map((checked, i) => (
-          <label key={`B${i + 1}`} className="mr-4">
-            <input
-              type="radio"
-              value={`B${i + 1}`}
-              onClick={() => handleGroupChange(i, checkedB, setCheckedB)}
-              checked={checked}
-            />
-            B{i + 1}
-          </label>
+          <input
+            key={`B${i + 1}`}
+            type="radio"
+            value={`B${i + 1}`}
+            onClick={() => handleGroupChange(i, checkedB, setCheckedB)}
+            checked={checked}
+          />
         ))}
       </div>
     </div>

@@ -90,14 +90,13 @@ const HomeScreen = () => {
       setArtists(response.data.Artists);
     });
     API.get.getPlaylists(userId).then((response) => {
-      console.log(response.data);
       setPlaylist(response.data);
       setIsLoading(false);
     });
   }, []);
 
   return (
-    <div className="h-screen w-full overflow-hidden flex transition-all bg-[#121212]">
+    <div className="h-[87vh] w-full overflow-hidden flex transition-all bg-[#121212]">
       <div className="bg-[#212121] w-full mt-2 mr-2 p-4 rounded-lg overflow-x-hidden">
         <div className="flex justify-between mt-6">
           <p className="text-white">Popular Artists</p>
@@ -120,8 +119,10 @@ const HomeScreen = () => {
             ))
           ) : (
             <>
-              {artists.map(() => (
-                <ArtistCardSkeleton />
+              {artists.map((index) => (
+                <div className="" key={index}>
+                  <ArtistCardSkeleton />
+                </div>
               ))}
             </>
           )}

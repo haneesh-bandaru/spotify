@@ -12,13 +12,16 @@ import {
 import spotifyLogo from "../../../assets/spotify.png";
 import { Input } from "@/components/ui/input";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import API from "@/services/API";
+import { debounce } from "lodash";
 
 type SideItemsType = {
   text: string;
   icon: React.ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
   >;
-  route: string; // Updated to accept any string route
+  route: string;
 };
 
 const sideItems: SideItemsType[] = [
@@ -60,9 +63,33 @@ const Library: SideItemsType[] = [
 const Aside = ({ onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchText, setSearchText] = useState("");
+
+  const searchSongs = useCallback(
+    debounce(async (text) => {
+      if (text.trim()) {
+        try {
+          const response = await API.get.globalSearch(text);
+          console.log(response.data.data);
+
+          navigate("/search", { state: response.data.data.albums });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }, 500),
+    [navigate]
+  );
+
+  useEffect(() => {
+    searchSongs(searchText);
+    return () => {
+      searchSongs.cancel();
+    };
+  }, [searchText, searchSongs]);
 
   return (
-    <div className="p-2 overflow-hidden max-w-48  min-w-48">
+    <div className="p-2 overflow-hidden max-w-48 min-w-48">
       {/* Logo & Search Part */}
       <div className="bg-[#212121] p-4 rounded-lg w-fit">
         <div className="flex items-center m-2 max-h-10 gap-2">
@@ -75,6 +102,7 @@ const Aside = ({ onLogout }) => {
           <Input
             className="outline-none border-0 focus-visible:ring-0 text-white"
             placeholder="What to play?"
+            onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
       </div>
@@ -89,9 +117,7 @@ const Aside = ({ onLogout }) => {
               className={`flex items-center text-gray-400 h-10 cursor-pointer hover:bg-black hover:rounded-full hover:w-fit hover:pr-6 ${
                 isActive ? "bg-black text-white rounded-full w-fit pr-6" : ""
               }`}
-              onClick={() => {
-                navigate(item.route);
-              }}
+              onClick={() => navigate(item.route)}
             >
               <item.icon className="mx-3" size={18} />
               <p>{item.text}</p>
@@ -100,7 +126,7 @@ const Aside = ({ onLogout }) => {
         })}
       </div>
 
-      <div className="flex flex-col mt-2 bg-[#212121] p-2 rounded-lg h-72">
+      <div className="flex flex-col mt-2 bg-[#212121] p-2 rounded-lg h-[33vh]">
         <p className="text-white text-xl mx-2 mt-4 ">Library</p>
         <div className="flex flex-col justify-between h-full">
           <div className="">
@@ -114,9 +140,7 @@ const Aside = ({ onLogout }) => {
                       ? "bg-black text-white rounded-full w-fit pr-6"
                       : ""
                   }`}
-                  onClick={() => {
-                    navigate("/liked-songs/1");
-                  }}
+                  onClick={() => navigate(item.route)}
                 >
                   <item.icon className="mx-2" size={18} />
                   <p>{item.text}</p>

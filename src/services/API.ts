@@ -56,6 +56,12 @@ export default {
         `${apiUrl}/v1/app/fetch-liked-songs?userId=${userId}`
       );
     },
+
+    globalSearch: (track: string) => {
+      return axios.get(
+        `https://jiosaavn-api-lac.vercel.app/api/search?query=${track}`
+      );
+    },
   },
   post: {
     login: (body: any) => {

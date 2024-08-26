@@ -36,7 +36,6 @@ interface ApiResponse {
 
 const ArtistsScreen = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [artistsData, setArtistsData] = useState<Artist[] | null>(null);
 
@@ -47,7 +46,6 @@ const ArtistsScreen = () => {
         const data: ApiResponse = response.data;
         setArtistsData(data.Data.Artists);
         console.log(artistsData);
-
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching artist data:", error);
@@ -68,7 +66,7 @@ const ArtistsScreen = () => {
 
   return (
     <div className="text-white overflow-scroll w-full">
-      <BackButton route="/home" />
+      <BackButton route={"/home"} />
       {artistsData.map((artist) => (
         <div key={artist.Artist_ID}>
           <div className=" flex items-center m-8 w-screen">

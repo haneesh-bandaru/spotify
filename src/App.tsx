@@ -12,6 +12,8 @@ import SignUpForm from "./screens/SignupScreen";
 import useAuthStore from "./store/store";
 import LikedSongs from "./screens/LikedSongsScreen";
 import Task from "./screens/Task";
+import Task2 from "./screens/Task2";
+import SearchScreen from "./screens/SearchScreen";
 
 const App = () => {
   const { isLoggedIn, setIsLoggedIn } = useAuthStore();
@@ -29,8 +31,10 @@ const App = () => {
       {isLoggedIn ? (
         <Routes>
           <Route path="/" element={<Layout onLogout={handleLogout} />}>
+            <Route path="*" element={<HomeScreen />} />
             <Route path="/task" element={<Task />} />
-            <Route path="/home" element={<HomeScreen />} />
+            <Route path="/task2" element={<Task2 />} />
+            <Route path="/home" index={true} element={<HomeScreen />} />
             <Route path="*" element={<HomeScreen />} />
             <Route path="/albums/:slug" element={<AlbumsScreen />} />
             <Route path="/artists/:slug" element={<ArtistsScreen />} />
@@ -39,6 +43,7 @@ const App = () => {
             <Route path="/radio" element={<RadioScreen />} />
             <Route path="/podcasts" element={<PodcastsScreen />} />
             <Route path="/liked-songs/:id" element={<LikedSongs />} />
+            <Route path="/search" element={<SearchScreen />} />
           </Route>
         </Routes>
       ) : (
