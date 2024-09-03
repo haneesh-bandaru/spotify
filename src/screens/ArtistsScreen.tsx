@@ -1,51 +1,90 @@
 import BackButton from "@/components/BackButton";
 import DisplaySong from "@/components/DisplaySong";
 import API from "@/services/API";
-import { ArrowLeft, ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 interface Track {
-  Track_ID: string;
-  TrackName: string;
-  Duration: number;
+  id: string;
+  name: string;
+  duration: number;
   path: string;
 }
 
 interface Album {
-  Album_ID: string;
-  AlbumName: string;
-  Release_Date: string;
-  Language: string;
-  AlbumImage: string | null;
-  Tracks: Track[];
+  id: string;
+  name: string;
+  releaseDate: string;
+  language: string;
+  image: string | null;
+  tracks: Track[] | null;
 }
 
 interface Artist {
-  Artist_ID: string;
-  ArtistName: string;
-  Genre: string;
-  Albums: Album[];
+  id: string;
+  name: string;
+  genre: string | null;
+  albums: Album[];
+  image: string | null;
 }
 
 interface ApiResponse {
-  Data: {
-    Artists: Artist[];
+  data: {
+    data: {
+      id: string;
+      name: string;
+      topAlbums: Array<{
+        id: string;
+        name: string;
+        year: number;
+        language: string;
+        image: Array<{
+          quality: string;
+          url: string;
+        }>;
+        songs: Track[] | null;
+      }>;
+      image: Array<{
+        quality: string;
+        url: string;
+      }>;
+    };
   };
 }
 
 const ArtistsScreen = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [artistsData, setArtistsData] = useState<Artist[] | null>(null);
+  const [artistData, setArtistData] = useState<Artist | null>(null);
 
   useEffect(() => {
     const fetchArtistData = async () => {
       try {
-        const response = await API.get.getArtistSongs(location.state as string);
-        const data: ApiResponse = response.data;
-        setArtistsData(data.Data.Artists);
-        console.log(artistsData);
+        const response: ApiResponse = await API.get.getArtistSongsFromSaavan(
+          location.state as number
+        );
+
+        const data = response.data.data;
+
+        const mappedArtist: Artist = {
+          id: data.id,
+          name: data.name,
+          genre: data.dominantType || null,
+          image:
+            data.image?.find((img) => img.quality === "500x500")?.url || null,
+          albums: data.topAlbums.map((album) => ({
+            id: album.id,
+            name: album.name,
+            releaseDate: album.year.toString(),
+            language: album.language,
+            image:
+              album.image?.find((img) => img.quality === "500x500")?.url ||
+              null,
+            tracks: album.songs || null,
+          })),
+        };
+
+        setArtistData(mappedArtist);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching artist data:", error);
@@ -60,44 +99,60 @@ const ArtistsScreen = () => {
     return <div>Loading...</div>;
   }
 
-  if (!artistsData || artistsData.length === 0) {
+  if (!artistData) {
     return <div>No artist data available.</div>;
   }
 
   return (
-    <div className="text-white overflow-scroll w-full">
-      <BackButton route={"/home"} />
-      {artistsData.map((artist) => (
-        <div key={artist.Artist_ID}>
-          <div className=" flex items-center m-8 w-screen">
-            <img
-              src={`https://avatar.iran.liara.run/public?username=${artist.ArtistName}`}
-              height={160}
-              width={160}
-              alt="No way!"
-              className="rounded-full object-cover"
-            />
-            <p className="text-8xl ">{artist.ArtistName}</p>
-          </div>
-          <p>Genre: {artist.Genre}</p>
-          {artist.Albums.map((album) => (
-            <div key={album.Album_ID} className="flex flex-col">
-              <div className="flex items-center justify-center px-4">
-                <h2>{album.AlbumName}</h2>
-                {/* <p>{new Date(album.Release_Date).toLocaleDateString()}</p> */}
+    <div className="text-white bg-[#212121] mt-2 mr-1 mb-3 rounded p-4 overflow-hidden  w-full">
+      <BackButton />
+      <div key={artistData.id}>
+        <div className="flex  items-center m-8 w-screen">
+          <img
+            src={
+              artistData.image ||
+              "https://avatar.iran.liara.run/public?username=unknown"
+            }
+            height={160}
+            width={160}
+            alt={artistData.name}
+            className="rounded-full object-cover"
+          />
+          <p className="text-7xl">{artistData.name}</p>
+        </div>
+        <p>Genre: {artistData.genre || "Unknown"}</p>
+        <div className="grid grid-cols-7 max-h-64 overflow-y-scroll overflow-x-hidden gap-y-6 ">
+          {artistData.albums?.map((album) => (
+            <div
+              key={album.id}
+              className="flex flex-col hover:bg-[#121212] cursor-pointer w-fit px-2 py-2 rounded-lg"
+              onClick={() => {
+                console.log(album.id);
+              }}
+            >
+              {album.image && (
+                <img
+                  src={album.image}
+                  alt={album.name}
+                  height={120}
+                  width={120}
+                />
+              )}
+              <div className="flex w-fit">
+                <p className="w-28 pt-3 ">
+                  {album.name.slice(0, 1).toUpperCase()}
+                  {album.name.slice(1)}
+                </p>
               </div>
-              {/* {album.Album_Image && (
-                <img src={album.Album_Image} alt={album.AlbumName} />
-              )} */}
-              <div className="relative bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 ">
-                {album.Tracks.map((track, index) => (
-                  <DisplaySong track={track} index={index} />
+              <div className="relative bg-[#121212] rounded-2xl flex flex-col gap-2">
+                {album.tracks?.map((track, index) => (
+                  <DisplaySong key={track.id} track={track} index={index} />
                 ))}
               </div>
             </div>
           ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 };

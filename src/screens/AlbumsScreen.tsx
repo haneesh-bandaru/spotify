@@ -1,22 +1,36 @@
+import BackButton from "@/components/BackButton";
 import DisplaySong from "@/components/DisplaySong";
 import API from "@/services/API";
-import { ArrowLeft, ChevronLeft, Dot, Heart, Menu, Play } from "lucide-react";
+import { Dot, Heart, Menu, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 type Track = {
-  TrackName: string;
-  Duration: number;
-  Path: string;
+  id: string;
+  name: string;
+  duration: number;
+  url: string;
+};
+
+type Artist = {
+  id: string;
+  name: string;
+  image: { quality: string; url: string }[];
+  url: string;
 };
 
 type AlbumData = {
-  "Album Name": string;
-  "Artist Name": string;
-  Genre: string;
-  Language: string;
-  Tracks: Track[];
-  AlbumImage: string;
+  id: string;
+  name: string;
+  description: string;
+  year: number;
+  language: string;
+  songCount: number;
+  artists: {
+    primary: Artist[];
+  };
+  image: { quality: string; url: string }[];
+  songs: Track[];
 };
 
 const AlbumsScreen = () => {
@@ -29,12 +43,12 @@ const AlbumsScreen = () => {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        const response = await API.get.getSongs(location.state as string);
-        const album: AlbumData = response.data[0];
+        const response = await API.get.getAlbumsFromSaavan(
+          location.state as number
+        );
+        const album: AlbumData = response.data.data;
         setAlbumData(album);
-        setSongs(album.Tracks);
-        console.log(album);
-
+        setSongs(album.songs);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching songs:", error);
@@ -48,48 +62,40 @@ const AlbumsScreen = () => {
   return (
     <div className="bg-[#121212] w-full my-2 mr-2">
       {!isLoading ? (
-        <div className="relative bg-[#212121] h-full text-white rounded-xl ">
+        <div className="relative bg-[#212121] h-full text-white rounded-xl">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
               backgroundImage: albumData
-                ? `url(${albumData.AlbumImage})`
+                ? `url(${albumData?.image[2].url})`
                 : "none",
               filter: "brightness(50%) blur(10px)",
             }}
           ></div>
-          <div
-            className="relative pt-4 pl-5 w-fit min-h-10 max-h-10 group cursor-pointer"
-            onClick={() => {
-              navigate("/home");
-            }}
-          >
-            <ChevronLeft className="bg-[#121212] rounded-full p-1 group-hover:hidden" />
-            <ArrowLeft className="bg-[#121212] rounded-full p-1 group-hover:block hidden" />
-          </div>
-
-          <div className="relative pt-14">
+          <BackButton />
+          <div className="relative ">
             {albumData && (
               <div className="flex items-center pl-20 gap-10">
                 <div className="flex text-8xl">
                   <img
-                    src={albumData.AlbumImage}
+                    src={albumData?.image[2].url}
                     height={150}
                     width={150}
-                    alt=""
+                    alt={albumData?.name}
                     className="rounded-full object-cover"
                   />
                 </div>
                 <div>
-                  <p className="text-8xl">{albumData["Album Name"]}</p>
+                  <p className="text-7xl">{albumData.name}</p>
                   <div className="flex mt-3">
-                    <p>{albumData["Artist Name"]}</p>
+                    <p>{albumData?.artists.primary[0].name}</p>
                     <Dot />
-                    <p>{albumData.Genre}</p>
+                    <p>{albumData?.description.split("·")[2].trim()}</p>{" "}
+                    {/* Genre */}
                     <Dot />
-                    <p>Language: {albumData.Language}</p>
+                    <p>Language: {albumData.language}</p>
                     <Dot />
-                    <p>{songs.length} songs</p>
+                    <p>{albumData.songCount} songs</p>
                   </div>
                 </div>
               </div>
@@ -107,9 +113,9 @@ const AlbumsScreen = () => {
                 Compact <Menu />
               </div>
             </div>
-            <div className="relative bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 ">
+            <div className="relative max-h-56 bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 overflow-scroll">
               {songs.map((song, index) => (
-                <DisplaySong track={song} index={index} />
+                <DisplaySong key={song.id} track={song} index={index} />
               ))}
             </div>
           </div>

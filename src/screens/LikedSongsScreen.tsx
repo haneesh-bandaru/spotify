@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "@/services/API";
-import useAuthStore from "../store/store";
+import useAuthStore from "../store/AuthStore";
 import BackButton from "@/components/BackButton";
 import DisplaySong from "@/components/DisplaySong";
 

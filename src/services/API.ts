@@ -62,6 +62,22 @@ export default {
         `https://jiosaavn-api-lac.vercel.app/api/search?query=${track}`
       );
     },
+
+    getAlbumsFromSaavan: (id: number) => {
+      return axios.get(`https://jiosaavn-api-lac.vercel.app/api/albums`, {
+        params: {
+          id: `${id}`,
+        },
+      });
+    },
+
+    getSongsFromSaavan: (id: string) => {
+      return axios.get(`https://jiosaavn-api-lac.vercel.app/api/songs/${id}`);
+    },
+
+    getArtistSongsFromSaavan: (id: number) => {
+      return axios.get(`https://jiosaavn-api-lac.vercel.app/api/artists/${id}`);
+    },
   },
   post: {
     login: (body: any) => {

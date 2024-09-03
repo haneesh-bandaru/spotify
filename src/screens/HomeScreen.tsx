@@ -5,7 +5,7 @@ import ArtistsCard from "../components/ArtistsCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import PlaylistsCard from "@/components/PlaylistsCard";
-import useAuthStore from "@/store/store";
+import useAuthStore from "@/store/AuthStore";
 
 type Album = {
   AlbumId: string;

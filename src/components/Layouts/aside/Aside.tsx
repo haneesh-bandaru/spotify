@@ -65,14 +65,16 @@ const Aside = ({ onLogout }) => {
   const location = useLocation();
   const [searchText, setSearchText] = useState("");
 
+  const searchOnClick =async()=>{
+    const response = await API.get.globalSearch(searchText);
+    navigate("/search", { state: response.data.data });
+  }
   const searchSongs = useCallback(
     debounce(async (text) => {
       if (text.trim()) {
         try {
           const response = await API.get.globalSearch(text);
-          console.log(response.data.data);
-
-          navigate("/search", { state: response.data.data.albums });
+          navigate("/search", { state: response.data.data });
         } catch (error) {
           console.error(error);
         }
@@ -86,7 +88,7 @@ const Aside = ({ onLogout }) => {
     return () => {
       searchSongs.cancel();
     };
-  }, [searchText, searchSongs]);
+  }, [searchText]);
 
   return (
     <div className="p-2 overflow-hidden max-w-48 min-w-48">
@@ -98,7 +100,7 @@ const Aside = ({ onLogout }) => {
         </div>
 
         <div className="flex bg-[#121212] items-center rounded-full px-3 h-fit">
-          <Search size={18} className="text-white" />
+          <Search size={18} className="text-white" onClick={()=>{searchOnClick()}} />
           <Input
             className="outline-none border-0 focus-visible:ring-0 text-white"
             placeholder="What to play?"

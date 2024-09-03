@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import spotifyLogo from "../assets/spotify.png";
 import API from "@/services/API";
 import { useNavigate } from "react-router-dom";
-import useAuthStore from "@/store/store";
+import useAuthStore from "@/store/AuthStore";
 
 interface SignUpFormInputs {
   name: string;

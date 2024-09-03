@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import API from "@/services/API";
-import useAuthStore from "../store/store";
+import useAuthStore from "../store/AuthStore";
 import spotifyLogo from "../assets/spotify.png";
 
 const Login = () => {

@@ -1,94 +1,117 @@
-import React from "react";
-import { useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import dummyImage from "/dummyImage.png";
 
-interface Image {
-  quality: string;
-  url: string;
-}
-
-interface ResultItem {
-  id: string;
-  title: string;
-  image: Image[];
-  type: string;
-  description: string;
-  artist?: string;
-  url?: string;
-  year?: string;
-  language?: string;
-  primaryArtists?: string;
-  singers?: string;
-  album?: string;
-  songIds?: string;
-}
-
-interface QueryData {
-  success: boolean;
-  data: {
-    topQuery?: {
-      results: ResultItem[];
-      position: number;
-    };
-    songs?: {
-      results: ResultItem[];
-      position: number;
-    };
-    albums?: {
-      results: ResultItem[];
-      position: number;
-    };
-    artists?: {
-      results: ResultItem[];
-      position: number;
-    };
-    playlists?: {
-      results: ResultItem[];
-      position: number;
-    };
-  };
-}
-
-const fetchSearchResults = async (query: string): Promise<QueryData> => {
-  const response = await axios.get<QueryData>(`/api/search?query=${query}`);
-  return response.data;
-};
-
-const SearchScreen: React.FC = () => {
+const SearchScreen = () => {
   const location = useLocation();
-  const query: string = location.state?.query ?? "";
-
-  const { data, isLoading, isError } = useQuery<QueryData>(
-    ["searchResults", query],
-    () => fetchSearchResults(query)
-  );
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (isError) {
-    return <div>Error fetching data</div>;
-  }
+  const navigate = useNavigate();
+  const data = location.state;
 
   return (
-    <div className="h-[80vh] w-full mt-2 mr-3 p-4 rounded-lg bg-[#212121] text-white">
-      {data?.data?.albums?.results && (
-        <div>
-          <h2>Albums</h2>
-          <ul>
-            {data.data.albums.results.map((album) => (
-              <li key={album.id}>
-                <img src={album.image[0].url} alt={album.title} />
-                <p>{album.title}</p>
-                <p>{album.description}</p>
-              </li>
-            ))}
-          </ul>
+    <div className="h-[80vh] w-screen bg-[#212121] mt-2 mb-3 rounded-lg mr-2 p-3 text-white overflow-scroll">
+      {/* Albums Section */}
+      <div>
+        <h2 className="  text-lg font-semibold mb-2">Albums</h2>
+        <div className="flex gap-10 ">
+          {data.albums.results.map((album, index) => (
+            <div
+              className="hover:bg-[#121212] mb-4 p-4 rounded-lg cursor-pointer"
+              key={index}
+              onClick={() => {
+                navigate(`/albums/${album.title}`, { state: album.id });
+              }}
+            >
+              <img
+                src={album.image[2].url}
+                alt={album.title}
+                className="w-40 h-40 rounded-xl"
+              />
+              <p className="text-white w-40">{album.title}</p>
+              <p className="text-gray-400 w-40">{album.description}</p>
+              <p className="text-gray-500">
+                {album.language[0].toUpperCase() + album.language.slice(1)}
+              </p>
+            </div>
+          ))}
         </div>
-      )}
-      {/* Repeat for other categories like songs, artists, playlists, etc. */}
+      </div>
+
+      {/* Songs Section */}
+      <div>
+        <h2 className="text-lg font-semibold mb-2">Songs</h2>
+        <div className="flex gap-10">
+          {data.songs.results.map((song, index) => (
+            <div
+              className="hover:bg-[#121212] mb-4 p-4 rounded-lg cursor-pointer"
+              key={index}
+              onClick={() => {
+                navigate(`/song/${song.title}`, { state: song.id });
+              }}
+            >
+              <img
+                src={song.image[2].url}
+                alt={song.title}
+                className="w-40 h-40"
+              />
+              <p className="text-white w-40">{song.title}</p>
+              <p className="text-gray-400">{song.description.slice(0, 20)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Artists Section */}
+      <div>
+        <h2 className="text-lg font-semibold mb-2">Artists</h2>
+        <div className="flex gap-10">
+          {data.artists.results.map((artist, index) => (
+            <div
+              className="hover:bg-[#121212] mb-4 p-4 rounded-lg cursor-pointer"
+              key={index}
+              onClick={() => {
+                navigate(`/artists/${artist.title}`, { state: artist.id });
+              }}
+            >
+              <img
+                src={artist.image[2].url || dummyImage}
+                alt={artist.title}
+                className="w-40 h-40"
+              />
+              <p className="text-white ">{artist.title}</p>
+              <p className="text-gray-400">{artist.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Playlists Section */}
+      <div>
+        <h2 className="text-lg font-semibold mb-2">Playlists</h2>
+        {data.playlists.results.length === 0 ? (
+          <p>No playlists found.</p>
+        ) : (
+          <div className="flex gap-10">
+            {data.playlists.results.map((playlist, index) => (
+              <div
+                className="hover:bg-[#121212] mb-4 p-4 rounded-lg cursor-pointer"
+                key={index}
+                onClick={() => {
+                  navigate(`/playlist/${playlist.title}`, {
+                    state: playlist.id,
+                  });
+                }}
+              >
+                <img
+                  src={playlist.image[2].url || dummyImage}
+                  alt={playlist.title}
+                  className="w-40 h-40"
+                />
+                <p className="text-white">{playlist.title}</p>
+                <p>{playlist.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
