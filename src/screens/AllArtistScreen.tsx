@@ -7,6 +7,7 @@ type Artists = {
   Artist_ID: string;
   Name: string;
   Genre: string;
+  ProfileImage: string;
 };
 
 const AllArtistScreen = () => {
@@ -22,8 +23,8 @@ const AllArtistScreen = () => {
   }, []);
 
   return (
-    <div className="w-screen bg-[#212121] mt-2 mb-3 rounded-xl p-2 overflow-hidden">
-      <BackButton route={"/home"} />
+    <div className="w-screen h-[87vh] bg-[#212121] mt-2 mb-3 rounded-xl p-2 overflow-hidden">
+      <BackButton />
       <h1 className="text-white translate-x-[40%]">Popular Artists</h1>
       <div className="flex flex-wrap justify-center">
         {!isLoading

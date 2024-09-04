@@ -2,7 +2,7 @@ import BackButton from "@/components/BackButton";
 import DisplaySong from "@/components/DisplaySong";
 import API from "@/services/API";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface Track {
   id: string;
@@ -56,6 +56,7 @@ const ArtistsScreen = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [artistData, setArtistData] = useState<Artist | null>(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchArtistData = async () => {
@@ -128,6 +129,7 @@ const ArtistsScreen = () => {
               className="flex flex-col hover:bg-[#121212] cursor-pointer w-fit px-2 py-2 rounded-lg"
               onClick={() => {
                 console.log(album.id);
+                navigate(`/albums/${album.name}`, { state: album.id });
               }}
             >
               {album.image && (

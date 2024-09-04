@@ -79,7 +79,7 @@ const HomeScreen = () => {
   const [artists, setArtists] = useState<Artists[]>([]);
   const [playlist, setPlaylist] = useState<Playlists[]>([]);
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const { userId } = useAuthStore();
 
   useEffect(() => {
@@ -94,6 +94,8 @@ const HomeScreen = () => {
       setIsLoading(false);
     });
   }, []);
+
+  console.log(playlist);
 
   return (
     <div className="h-[87vh] w-full overflow-hidden flex transition-all bg-[#121212]">
@@ -119,8 +121,8 @@ const HomeScreen = () => {
             ))
           ) : (
             <>
-              {artists.map((index) => (
-                <div className="" key={index}>
+              {artists.map(() => (
+                <div className="">
                   <ArtistCardSkeleton />
                 </div>
               ))}

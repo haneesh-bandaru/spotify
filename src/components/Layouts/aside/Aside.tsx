@@ -1,9 +1,11 @@
 import {
   DiscAlbum,
+  EllipsisVertical,
   Headphones,
   Heart,
   Home,
   LogOut,
+  LucideLogOut,
   LucideProps,
   Podcast,
   Radio,
@@ -15,6 +17,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import API from "@/services/API";
 import { debounce } from "lodash";
+import { Popover, PopoverContent } from "@/components/ui/popover";
+import { PopoverTrigger } from "@radix-ui/react-popover";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTheme } from "@/components/theme-provider";
+import { Switch } from "@/components/ui/switch";
 
 type SideItemsType = {
   text: string;
@@ -64,11 +71,12 @@ const Aside = ({ onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchText, setSearchText] = useState("");
+  const { setTheme, theme } = useTheme();
 
-  const searchOnClick =async()=>{
+  const searchOnClick = async () => {
     const response = await API.get.globalSearch(searchText);
     navigate("/search", { state: response.data.data });
-  }
+  };
   const searchSongs = useCallback(
     debounce(async (text) => {
       if (text.trim()) {
@@ -100,7 +108,13 @@ const Aside = ({ onLogout }) => {
         </div>
 
         <div className="flex bg-[#121212] items-center rounded-full px-3 h-fit">
-          <Search size={18} className="text-white" onClick={()=>{searchOnClick()}} />
+          <Search
+            size={18}
+            className="text-white"
+            onClick={() => {
+              searchOnClick();
+            }}
+          />
           <Input
             className="outline-none border-0 focus-visible:ring-0 text-white"
             placeholder="What to play?"
@@ -137,12 +151,12 @@ const Aside = ({ onLogout }) => {
               return (
                 <div
                   key={index}
-                  className={`flex items-center text-gray-400 h-10 cursor-pointer hover:bg-black hover:rounded-full hover:w-fit hover:pr-6 ${
+                  className={`flex items-center h-10 cursor-pointer hover:bg-black hover:rounded-full hover:w-fit hover:pr-6 ${
                     isActive
                       ? "bg-black text-white rounded-full w-fit pr-6"
                       : ""
                   }`}
-                  onClick={() => navigate(item.route)}
+                  onClick={() => navigate(item.route)} 
                 >
                   <item.icon className="mx-2" size={18} />
                   <p>{item.text}</p>
@@ -150,13 +164,35 @@ const Aside = ({ onLogout }) => {
               );
             })}
           </div>
-          <div
-            className="text-gray-400 text-xl mx-2 mt-4 flex items-center gap-1 cursor-pointer"
-            onClick={onLogout}
-          >
-            <LogOut size={20} />
-            Logout
-          </div>
+
+          <Popover >
+            <PopoverTrigger className="bg-[#212121] border-none text-white">
+              <div className="flex items-center gap-2 cursor-pointer">
+                <Avatar>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <p>Miracle Labs</p>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-fit ml-5 flex flex-col-reverse gap-4">
+              {/* <Separator /> */}
+              <div className="flex gap-2 items-center">
+                <Switch
+                  checked={theme === "dark"}
+                  onCheckedChange={(e) => setTheme(e ? "dark" : "light")}
+                />
+                <span>Switch Theme</span>
+              </div>
+              <div
+                className="flex text-lg items-center gap-4 ml-3 hover:cursor-pointer"
+                // onClick={handleLogout}
+              >
+                <LucideLogOut size={20} />
+                Logout
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>

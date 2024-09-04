@@ -4,6 +4,7 @@ interface Artists {
   Artist_ID: string;
   Name: string;
   Genre: string;
+  profile_image: string;
 }
 
 const ArtistsCard = ({ item }: Artists) => {
@@ -16,10 +17,10 @@ const ArtistsCard = ({ item }: Artists) => {
       }}
     >
       <img
-        src={`https://avatar.iran.liara.run/public?username=${item.Name}`}
+        src={`${item.ProfileImage}`}
         height={160}
         width={160}
-        alt="No way!"
+        alt={`${item.Name}`}
         className="rounded-full object-cover"
       />
       <p className="text-white">{item.Name}</p>

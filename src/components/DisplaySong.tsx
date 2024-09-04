@@ -2,12 +2,19 @@ import { Heart, Play } from "lucide-react";
 import { useState } from "react";
 import usePlaybackStore from "@/store/PlayBackStore";
 
-const DisplaySong = ({ track, index }) => {
-  const { playTrack, currentTrack } = usePlaybackStore();
+type Tracks = {
+  id: string;
+  title: string;
+  duration: number;
+  name: string;
+};
+
+const DisplaySong = ({ track, index }: { track: Tracks; index: number }) => {
+  const { setTrackId } = usePlaybackStore();
   const [isLiked, setIsLiked] = useState(false);
 
   const playSong = async () => {
-    await playTrack(track.id);
+    setTrackId(track.id);
   };
 
   const toggleLike = () => {
@@ -38,4 +45,3 @@ const DisplaySong = ({ track, index }) => {
 };
 
 export default DisplaySong;
-  

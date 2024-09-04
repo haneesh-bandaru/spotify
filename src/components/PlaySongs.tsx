@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import {
   Maximize2,
   Pause,
@@ -12,49 +11,104 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Slider } from "./ui/slider";
+import { useState, useRef, useEffect } from "react";
 import usePlaybackStore from "@/store/PlayBackStore";
+import API from "@/services/API";
 
 const PlaySongs = () => {
+  const [showPlayingScreen, setShowPlayingScreen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [lyrics, setLyrics] = useState("");
   const {
     isPlaying,
     currentTrack,
-    setPlaying,
     volume,
+    isShuffle,
+    isRepeat,
+    trackId,
+    setPlaying,
+    setTrack,
     setVolume,
     toggleShuffle,
     toggleRepeat,
-    isShuffle,
-    isRepeat,
   } = usePlaybackStore();
 
-  const [currentTime, setCurrentTime] = useState(0);
-  const [showPlayingScreen, setShowPlayingScreen] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const fetchTrackData = async (id) => {
+    try {
+      const response = await API.get.getSongsFromSaavan(id);
+      const lyr = await API.get.getLyricsFromSong(id);
+      setLyrics(lyr.data.data.lyrics);
+      return response.data.data[0];
+    } catch (error) {
+      console.error("Failed to fetch track data:", error);
+      return null;
+    }
+  };
+
+  const formattedLyrics = lyrics.replace(/<br>/g, "\n");
+
+  useEffect(() => {
+    const loadTrackData = async () => {
+      if (!trackId) return;
+      const trackData = await fetchTrackData(trackId);
+      if (trackData) {
+        const highQualityUrl = trackData.downloadUrl.find(
+          (url) => url.quality === "320kbps"
+        )?.url;
+
+        setTrack({
+          id: trackData.id,
+          title: trackData.name,
+          artist: trackData.artists.primary[0]?.name || "Unknown Artist",
+          duration: trackData.duration,
+          image: trackData.image?.[2]?.url || null,
+          audioUrl: highQualityUrl || "",
+        });
+
+        if (audioRef.current && highQualityUrl) {
+          audioRef.current.src = highQualityUrl;
+          audioRef.current.volume = volume / 100;
+          audioRef.current.play();
+          setPlaying(true);
+        }
+      }
+    };
+
+    loadTrackData();
+  }, [trackId]);
 
   useEffect(() => {
     if (audioRef.current) {
+      const updateTime = () => {
+        setCurrentTime(audioRef.current.currentTime);
+      };
+
+      audioRef.current.addEventListener("timeupdate", updateTime);
+      audioRef.current.addEventListener("loadedmetadata", () => {
+        setDuration(audioRef.current.duration);
+      });
+
+      return () => {
+        audioRef.current.removeEventListener("timeupdate", updateTime);
+      };
+    }
+  }, []);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
       if (isPlaying) {
-        audioRef.current.play().catch((error) => {
-          console.error("Error playing the audio:", error);
-        });
-      } else {
         audioRef.current.pause();
+      } else {
+        audioRef.current.play();
       }
     }
-  }, [isPlaying, currentTrack]);
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
+    setPlaying(!isPlaying);
   };
 
-  const handleSeek = (value: number[]) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = value[0];
-      setCurrentTime(value[0]);
-    }
-  };
+  const togglePlayingScreen = () => setShowPlayingScreen(!showPlayingScreen);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -62,38 +116,40 @@ const PlaySongs = () => {
     }
   }, [volume]);
 
-  const togglePlay = () => setPlaying(!isPlaying);
+  const handleSliderChange = (value) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = (value / 100) * duration;
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
 
-  const togglePlayingScreen = () => setShowPlayingScreen(!showPlayingScreen);
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
 
   return (
-    <div>
+    <div className="">
       <footer className="h-20 bg-[#121212] border-t flex items-center justify-between px-4">
         <div className="flex items-center gap-4 text-white">
           <div className="w-14 h-14 bg-muted">
-            {currentTrack?.image ? (
+            {currentTrack?.image && (
               <img
                 src={currentTrack.image}
-                alt="Album Art"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = "/fallback-image.png"; // Local fallback image
-                }}
-              />
-            ) : (
-              <img
-                src="/fallback-image.png"
-                alt="Fallback Album Art"
+                alt="Track Art"
                 className="w-full h-full object-cover"
               />
             )}
           </div>
           <div>
             <h4 className="font-semibold">
-              {currentTrack ? currentTrack.title : "Song Title"}
+              {currentTrack?.title || "Song Title"}
             </h4>
             <p className="text-sm text-muted-foreground">
-              {currentTrack ? currentTrack.artist : "Artist Name"}
+              {currentTrack?.artist || "Artist Name"}
             </p>
           </div>
         </div>
@@ -106,7 +162,7 @@ const PlaySongs = () => {
               onClick={toggleShuffle}
             >
               <Shuffle
-                className={`h-4 w-4 ${isShuffle ? "text-green-500" : ""}`}
+                className={`h-4 w-4 ${isShuffle ? "text-blue-500" : ""}`}
               />
             </Button>
             <Button variant="ghost" size="icon" className="border-none">
@@ -134,26 +190,40 @@ const PlaySongs = () => {
               onClick={toggleRepeat}
             >
               <Repeat
-                className={`h-4 w-4 ${isRepeat ? "text-green-500" : ""}`}
+                className={`h-4 w-4 ${isRepeat ? "text-blue-500" : ""}`}
               />
             </Button>
           </div>
-          <Slider
-            className="w-[400px] mt-2"
-            value={[currentTime]}
-            onValueChange={handleSeek}
-            max={audioRef.current?.duration || 100}
-            step={1}
-          />
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {formatTime(currentTime)}
+            </span>
+            <Slider
+              className="w-[400px] mt-2"
+              value={[(currentTime / duration) * 100 || 0]}
+              max={100}
+              step={1}
+              onValueChange={handleSliderChange}
+            />
+            <span className="text-sm text-muted-foreground">
+              {formatTime(duration)}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Volume2 className="h-4 w-4" />
           <Slider
             className="w-[100px]"
             value={[volume]}
-            onValueChange={([value]) => setVolume(value)}
             max={100}
             step={1}
+            onValueChange={(value) => {
+              setVolume(value[0]);
+              if (audioRef.current) {
+                audioRef.current.volume = value[0] / 100;
+              }
+            }}
+            
           />
           <Button
             variant="ghost"
@@ -167,50 +237,64 @@ const PlaySongs = () => {
       </footer>
 
       {showPlayingScreen && (
-        <div className="fixed inset-0 bg-[#121212] z-50 flex flex-col">
+        <div className=" fixed inset-0 bg-[#121212] z-50 flex flex-col">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: currentTrack
+                ? `url(${currentTrack?.image})`
+                : "none",
+              filter: "brightness(50%) blur(10px)",
+            }}
+          ></div>
           <Button
             variant="ghost"
-            className="absolute top-4 right-4 border-none"
+            className="relative w-10 top-4 left-[96vw] border-none cursor-pointer"
             onClick={togglePlayingScreen}
           >
-            <X className="h-6 w-6" />
+            X
           </Button>
-          <div className="flex-1 flex items-center justify-center">
+          <div className="relative flex-1 flex items-center justify-around">
             <div className="text-center">
               <div className="w-64 h-64 bg-muted mx-auto mb-8">
-                {currentTrack?.image ? (
+                {currentTrack?.image && (
                   <img
                     src={currentTrack.image}
-                    alt="Album Art"
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = "/fallback-image.png";
-                    }}
-                  />
-                ) : (
-                  <img
-                    src="/fallback-image.png"
-                    alt="Fallback Album Art"
+                    alt="Track Art"
                     className="w-full h-full object-cover"
                   />
                 )}
               </div>
-              <h2 className="text-2xl font-bold text-white">
-                {currentTrack ? currentTrack.title : "Song Title"}
+
+              <h2 className="whitespace-pre-wrap break-words w-64 text-2xl font-bold text-white">
+                {currentTrack?.title || "Song Title"}
               </h2>
-              <p className="text-muted-foreground">
-                {currentTrack ? currentTrack.artist : "Artist Name"}
-              </p>
+              <span className="text-muted-foreground">
+                {currentTrack?.artist || "Artist Name"}
+              </span>
+            </div>
+            <div className="max-w-3xl p-4 bg-gray-100 rounded-lg shadow-lg">
+              <pre className="whitespace-pre-wrap h-96 break-words text-gray-800 text-base overflow-scroll">
+                {formattedLyrics}
+              </pre>
             </div>
           </div>
-          <div className="h-40 flex flex-col items-center justify-center">
-            <Slider
-              className="w-[80%] max-w-[400px] mb-4"
-              value={[currentTime]}
-              onValueChange={handleSeek}
-              max={audioRef.current?.duration || 100}
-              step={1}
-            />
+          <div className="relative h-40 flex flex-col items-center justify-center">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                {formatTime(currentTime)}
+              </span>
+              <Slider
+                className="w-[400px] mt-2"
+                value={[(currentTime / duration) * 100 || 0]}
+                max={100}
+                step={1}
+                onValueChange={handleSliderChange}
+              />
+              <span className="text-sm text-muted-foreground">
+                {formatTime(duration)}
+              </span>
+            </div>
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
@@ -219,7 +303,7 @@ const PlaySongs = () => {
                 onClick={toggleShuffle}
               >
                 <Shuffle
-                  className={`h-6 w-6 ${isShuffle ? "text-green-500" : ""}`}
+                  className={`h-6 w-6 ${isShuffle ? "text-blue-500" : ""}`}
                 />
               </Button>
               <Button variant="ghost" size="icon" className="border-none">
@@ -247,7 +331,7 @@ const PlaySongs = () => {
                 onClick={toggleRepeat}
               >
                 <Repeat
-                  className={`h-6 w-6 ${isRepeat ? "text-green-500" : ""}`}
+                  className={`h-6 w-6 ${isRepeat ? "text-blue-500" : ""}`}
                 />
               </Button>
             </div>
@@ -255,15 +339,8 @@ const PlaySongs = () => {
         </div>
       )}
 
-      {currentTrack?.audioUrl && (
-        <audio
-          ref={audioRef}
-          src={currentTrack.audioUrl}
-          onTimeUpdate={handleTimeUpdate}
-          onError={() => console.error("Failed to load audio source.")}
-          onEnded={() => setPlaying(false)}
-        />
-      )}
+      {/* Audio player */}
+      <audio ref={audioRef} onEnded={() => setPlaying(false)} />
     </div>
   );
 };

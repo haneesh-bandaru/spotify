@@ -1,5 +1,5 @@
 import axios from "axios";
-const apiUrl = `http://localhost:8000`;
+const apiUrl = `http://172.17.10.89:8000`;
 
 // Create an Axios instance
 const axiosInstance = axios.create();
@@ -78,6 +78,14 @@ export default {
     getArtistSongsFromSaavan: (id: number) => {
       return axios.get(`https://jiosaavn-api-lac.vercel.app/api/artists/${id}`);
     },
+
+    getPlaylistsFromSaavan: (id: string) => {
+      return axios.get(`https://jiosaavn-api-lac.vercel.app/api/playlists?id=${id}`);
+    },
+
+    getLyricsFromSong:(id:string) =>{
+      return axios.get(`https://jiosaavn-api-lac.vercel.app/api/songs/${id}/lyrics`)
+    }
   },
   post: {
     login: (body: any) => {

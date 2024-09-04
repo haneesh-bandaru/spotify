@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import API from "@/services/API";
 import BackButton from "@/components/BackButton";
+import usePlaybackStore from "@/store/PlayBackStore";
+import { Play } from "lucide-react";
 
 interface Album {
   id: string;
@@ -47,15 +49,15 @@ const SongsScreen = () => {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [songs, setSongs] = useState<Song[]>([]);
+  const { setTrackId } = usePlaybackStore();
 
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        console.log(location.state);
-        
-        const response = await API.get.getSongsFromSaavan(location.state as number);
+        const response = await API.get.getSongsFromSaavan(
+          location.state as string
+        );
         setSongs(response.data.data);
-        console.log(songs);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching playlists:", error);
@@ -70,7 +72,7 @@ const SongsScreen = () => {
     <div className="bg-[#121212] w-full my-2 mr-2 overflow-scroll">
       {!isLoading ? (
         <div className="relative bg-[#212121] h-full text-white rounded-xl">
-          <BackButton route={"/home"} />
+          <BackButton />
           <div className="relative pt-10 pl-8">
             <h2 className="text-xl font-bold mb-4">Songs</h2>
             {songs.map((song) => (
@@ -87,14 +89,12 @@ const SongsScreen = () => {
                       {song?.album?.name} ({song.year})
                     </p>
                     <p>{song.duration} seconds</p>
-                    <a
-                      href={song.url}
-                      className="text-blue-400"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Listen
-                    </a>
+                    <Play
+                      className="text-[#1DB954] cursor-pointer"
+                      onClick={() => {
+                        setTrackId(song.id);
+                      }}
+                    />
                   </div>
                 </div>
               </div>

@@ -10,6 +10,7 @@ type Tracks = {
 };
 
 type Playlists = {
+  ImageUrl: string;
   Playlist_ID: string;
   Playlist_Name: string;
   Status: string;
@@ -26,22 +27,22 @@ const PlaylistsCard: React.FC<PlaylistsCardProps> = ({ item }) => {
     <div
       className="p-4 rounded-lg bg-[#121212] text-white w-40 cursor-pointer"
       onClick={() => {
-        navigate(`/playlist/${item.Playlist_Name}`, {
-          state: item.Playlist_ID,
+        navigate(`/playlist/${item?.Playlist_Name}`, {
+          state: item?.Playlist_ID,
         });
       }}
     >
       <img
-        src={`https://avatar.iran.liara.run/username?username=${item.Playlist_Name}`}
-        alt={item.Playlist_Name}
+        src={`${item?.ImageUrl}`}
+        alt={item?.Playlist_Name}
         className="w-full object-cover rounded-lg"
       />
       <div className="mt-2">
         <h3 className="flex items-center justify-between text-lg font-bold">
-          {item.Playlist_Name}
-          {item.Status === "Private" ? <Lock size={16} /> : ""}
+          {item?.Playlist_Name}
+          {item?.Status === "Private" ? <Lock size={16} /> : ""}
         </h3>
-        <p className="text-gray-500 text-md"> {item.Tracks.length} songs</p>
+        <p className="text-gray-500 text-md"> {item?.Tracks?.length} songs</p>
       </div>
     </div>
   );
