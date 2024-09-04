@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   Maximize2,
   Pause,
@@ -11,40 +12,49 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Slider } from "./ui/slider";
-import { useState, useRef, useEffect } from "react";
 import usePlaybackStore from "@/store/PlayBackStore";
 
 const PlaySongs = () => {
-  const [showPlayingScreen, setShowPlayingScreen] = useState(false);
   const {
     isPlaying,
     currentTrack,
-    volume,
-    isShuffle,
-    isRepeat,
     setPlaying,
+    volume,
     setVolume,
     toggleShuffle,
     toggleRepeat,
-    playTrack,
+    isShuffle,
+    isRepeat,
   } = usePlaybackStore();
 
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [showPlayingScreen, setShowPlayingScreen] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const togglePlay = async () => {
-    if (!isPlaying && currentTrack) {
-      await playTrack(currentTrack.id);
-    } else if (audioRef.current) {
+  useEffect(() => {
+    if (audioRef.current) {
       if (isPlaying) {
-        audioRef.current.pause();
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing the audio:", error);
+        });
       } else {
-        audioRef.current.play();
+        audioRef.current.pause();
       }
     }
-    setPlaying(!isPlaying);
+  }, [isPlaying, currentTrack]);
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
   };
 
-  const togglePlayingScreen = () => setShowPlayingScreen(!showPlayingScreen);
+  const handleSeek = (value: number[]) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = value[0];
+      setCurrentTime(value[0]);
+    }
+  };
 
   useEffect(() => {
     if (audioRef.current) {
@@ -52,34 +62,38 @@ const PlaySongs = () => {
     }
   }, [volume]);
 
-  useEffect(() => {
-    if (audioRef.current && currentTrack) {
-      audioRef.current.src = currentTrack.audioUrl;
-      if (isPlaying) {
-        audioRef.current.play();
-      }
-    }
-  }, [currentTrack]);
+  const togglePlay = () => setPlaying(!isPlaying);
+
+  const togglePlayingScreen = () => setShowPlayingScreen(!showPlayingScreen);
 
   return (
-    <div className="">
+    <div>
       <footer className="h-20 bg-[#121212] border-t flex items-center justify-between px-4">
         <div className="flex items-center gap-4 text-white">
           <div className="w-14 h-14 bg-muted">
-            {currentTrack?.image && (
+            {currentTrack?.image ? (
               <img
                 src={currentTrack.image}
-                alt="Track Art"
+                alt="Album Art"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = "/fallback-image.png"; // Local fallback image
+                }}
+              />
+            ) : (
+              <img
+                src="/fallback-image.png"
+                alt="Fallback Album Art"
                 className="w-full h-full object-cover"
               />
             )}
           </div>
           <div>
             <h4 className="font-semibold">
-              {currentTrack?.title || "Song Title"}
+              {currentTrack ? currentTrack.title : "Song Title"}
             </h4>
             <p className="text-sm text-muted-foreground">
-              {currentTrack?.artist || "Artist Name"}
+              {currentTrack ? currentTrack.artist : "Artist Name"}
             </p>
           </div>
         </div>
@@ -92,7 +106,7 @@ const PlaySongs = () => {
               onClick={toggleShuffle}
             >
               <Shuffle
-                className={`h-4 w-4 ${isShuffle ? "text-blue-500" : ""}`}
+                className={`h-4 w-4 ${isShuffle ? "text-green-500" : ""}`}
               />
             </Button>
             <Button variant="ghost" size="icon" className="border-none">
@@ -120,25 +134,26 @@ const PlaySongs = () => {
               onClick={toggleRepeat}
             >
               <Repeat
-                className={`h-4 w-4 ${isRepeat ? "text-blue-500" : ""}`}
+                className={`h-4 w-4 ${isRepeat ? "text-green-500" : ""}`}
               />
             </Button>
           </div>
-          <Slider className="w-[400px] mt-2" value={[33]} max={100} step={1} />
+          <Slider
+            className="w-[400px] mt-2"
+            value={[currentTime]}
+            onValueChange={handleSeek}
+            max={audioRef.current?.duration || 100}
+            step={1}
+          />
         </div>
         <div className="flex items-center gap-2">
           <Volume2 className="h-4 w-4" />
           <Slider
             className="w-[100px]"
             value={[volume]}
+            onValueChange={([value]) => setVolume(value)}
             max={100}
             step={1}
-            onValueChange={(value) => {
-              setVolume(value[0]);
-              if (audioRef.current) {
-                audioRef.current.volume = value[0] / 100;
-              }
-            }}
           />
           <Button
             variant="ghost"
@@ -163,27 +178,37 @@ const PlaySongs = () => {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="w-64 h-64 bg-muted mx-auto mb-8">
-                {currentTrack?.image && (
+                {currentTrack?.image ? (
                   <img
                     src={currentTrack.image}
-                    alt="Track Art"
+                    alt="Album Art"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "/fallback-image.png";
+                    }}
+                  />
+                ) : (
+                  <img
+                    src="/fallback-image.png"
+                    alt="Fallback Album Art"
                     className="w-full h-full object-cover"
                   />
                 )}
               </div>
               <h2 className="text-2xl font-bold text-white">
-                {currentTrack?.title || "Song Title"}
+                {currentTrack ? currentTrack.title : "Song Title"}
               </h2>
               <p className="text-muted-foreground">
-                {currentTrack?.artist || "Artist Name"}
+                {currentTrack ? currentTrack.artist : "Artist Name"}
               </p>
             </div>
           </div>
           <div className="h-40 flex flex-col items-center justify-center">
             <Slider
               className="w-[80%] max-w-[400px] mb-4"
-              value={[33]}
-              max={100}
+              value={[currentTime]}
+              onValueChange={handleSeek}
+              max={audioRef.current?.duration || 100}
               step={1}
             />
             <div className="flex items-center gap-4">
@@ -194,7 +219,7 @@ const PlaySongs = () => {
                 onClick={toggleShuffle}
               >
                 <Shuffle
-                  className={`h-6 w-6 ${isShuffle ? "text-blue-500" : ""}`}
+                  className={`h-6 w-6 ${isShuffle ? "text-green-500" : ""}`}
                 />
               </Button>
               <Button variant="ghost" size="icon" className="border-none">
@@ -222,7 +247,7 @@ const PlaySongs = () => {
                 onClick={toggleRepeat}
               >
                 <Repeat
-                  className={`h-6 w-6 ${isRepeat ? "text-blue-500" : ""}`}
+                  className={`h-6 w-6 ${isRepeat ? "text-green-500" : ""}`}
                 />
               </Button>
             </div>
@@ -230,8 +255,15 @@ const PlaySongs = () => {
         </div>
       )}
 
-      {/* Audio player */}
-      <audio ref={audioRef} onEnded={() => setPlaying(false)} />
+      {currentTrack?.audioUrl && (
+        <audio
+          ref={audioRef}
+          src={currentTrack.audioUrl}
+          onTimeUpdate={handleTimeUpdate}
+          onError={() => console.error("Failed to load audio source.")}
+          onEnded={() => setPlaying(false)}
+        />
+      )}
     </div>
   );
 };

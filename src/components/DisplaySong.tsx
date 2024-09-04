@@ -1,9 +1,9 @@
-import usePlaybackStore from "@/store/PlayBackStore";
 import { Heart, Play } from "lucide-react";
 import { useState } from "react";
+import usePlaybackStore from "@/store/PlayBackStore";
 
 const DisplaySong = ({ track, index }) => {
-  const { currentTrack, playTrack } = usePlaybackStore();
+  const { playTrack, currentTrack } = usePlaybackStore();
   const [isLiked, setIsLiked] = useState(false);
 
   const playSong = async () => {
@@ -22,15 +22,12 @@ const DisplaySong = ({ track, index }) => {
       <div className="flex items-center gap-4">
         <Play className="text-[#1DB954] cursor-pointer" onClick={playSong} />
         {index + 1}
-        <p className="text-lg">{track?.TrackName || track?.name}</p>
+        <p className="text-lg">{track?.title || track?.name}</p>
       </div>
       <div className="flex items-center gap-6">
         <p>
-          {Math.floor(track?.Duration / 60 || track?.duration / 60)}:
-          {String(track?.Duration % 60 || track?.duration % 60).padStart(
-            2,
-            "0"
-          )}
+          {Math.floor(track?.duration / 60)}:
+          {String(track?.duration % 60).padStart(2, "0")}
         </p>
         <p onClick={toggleLike}>
           {isLiked ? <Heart color="red" fill="red" /> : <Heart />}
@@ -41,3 +38,4 @@ const DisplaySong = ({ track, index }) => {
 };
 
 export default DisplaySong;
+  
