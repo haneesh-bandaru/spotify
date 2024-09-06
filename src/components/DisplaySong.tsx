@@ -1,4 +1,4 @@
-import { Heart, Play } from "lucide-react";
+import { Heart, Pause, Play } from "lucide-react";
 import { useState } from "react";
 import usePlaybackStore from "@/store/PlayBackStore";
 
@@ -10,7 +10,7 @@ type Tracks = {
 };
 
 const DisplaySong = ({ track, index }: { track: Tracks; index: number }) => {
-  const { setTrackId } = usePlaybackStore();
+  const { trackId, setTrackId } = usePlaybackStore();
   const [isLiked, setIsLiked] = useState(false);
 
   const playSong = async () => {
@@ -24,12 +24,16 @@ const DisplaySong = ({ track, index }: { track: Tracks; index: number }) => {
   return (
     <div
       key={track?.id}
-      className="flex items-center justify-between mb-2 p-2 bg-[#1e1e1e] rounded-lg group"
+      className="flex items-center justify-between mb-2 p-2 bg-[#1e1e1e] rounded-lg group "
     >
-      <div className="flex items-center gap-4">
-        <Play className="text-[#1DB954] cursor-pointer" onClick={playSong} />
+      <div
+        className="flex items-center gap-4 cursor-pointer"
+        onClick={playSong}
+      >
+        {trackId === track.id ? <Pause /> : <Play />}
+
         {index + 1}
-        <p className="text-lg">{track?.title || track?.name}</p>
+        <p className="text-lg ">{track?.title || track?.name}</p>
       </div>
       <div className="flex items-center gap-6">
         <p>

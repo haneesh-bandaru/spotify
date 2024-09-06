@@ -60,9 +60,9 @@ const AlbumsScreen = () => {
   }, [location.state]);
 
   return (
-    <div className="bg-[#121212] w-full my-2 mr-2">
+    <div className=" bg-background w-full my-2 mr-2">
       {!isLoading ? (
-        <div className="relative bg-[#212121] h-full text-white rounded-xl">
+        <div className="relative bg-muted h-full text-text rounded-xl">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
@@ -102,7 +102,7 @@ const AlbumsScreen = () => {
             )}
             <div className="relative flex justify-between ml-6">
               <div className="flex gap-10 pt-6">
-                <div className="bg-primary text-black rounded-full w-[24px] h-[24px] p-1">
+                <div className="bg-primary text-text rounded-full w-[24px] h-[24px] p-1">
                   <Play size={24} />
                 </div>
                 <div className="text-gray-400 rounded-full w-[24px] h-[24px] p-1">
@@ -113,7 +113,7 @@ const AlbumsScreen = () => {
                 Compact <Menu />
               </div>
             </div>
-            <div className="relative max-h-56 bg-[#121212] m-4 p-4 rounded-2xl flex flex-col gap-4 overflow-scroll">
+            <div className="relative max-h-56 bg-muted m-4 p-4 rounded-2xl flex flex-col gap-4 overflow-scroll">
               {songs.map((song, index) => (
                 <DisplaySong key={song.id} track={song} index={index} />
               ))}

@@ -101,37 +101,37 @@ const Aside = ({ onLogout }) => {
   return (
     <div className="p-2 overflow-hidden max-w-48 min-w-48">
       {/* Logo & Search Part */}
-      <div className="bg-[#212121] p-4 rounded-lg w-fit">
+      <div className="bg-muted p-4 rounded-lg w-fit">
         <div className="flex items-center m-2 max-h-10 gap-2">
           <img src={spotifyLogo} width={26} alt="Spotify Logo" />
           <p className="font-bold text-lg text-green-500 h-fit">Spotify</p>
         </div>
 
-        <div className="flex bg-[#121212] items-center rounded-full px-3 h-fit">
+        <div className="flex bg-background items-center rounded-full px-3 h-fit">
           <Search
             size={18}
-            className="text-white"
+            className="text-text"
             onClick={() => {
               searchOnClick();
             }}
           />
           <Input
-            className="outline-none border-0 focus-visible:ring-0 text-white"
+            className="outline-none border-0 focus-visible:ring-0 text-text"
             placeholder="What to play?"
             onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="flex flex-col mt-2 bg-[#212121] p-2 rounded-lg">
-        <p className="text-white mr-1">Menu</p>
+      <div className="flex flex-col mt-2 bg-muted p-2 rounded-lg">
+        <p className="text-text mr-1">Menu</p>
         {sideItems.map((item, index) => {
           const isActive = location.pathname === item.route;
           return (
             <div
               key={index}
-              className={`flex items-center text-gray-400 h-10 cursor-pointer hover:bg-black hover:rounded-full hover:w-fit hover:pr-6 ${
-                isActive ? "bg-black text-white rounded-full w-fit pr-6" : ""
+              className={`flex items-center text-gray-400 h-10 cursor-pointer hover:bg-muted hover:rounded-full hover:w-fit hover:pr-6 ${
+                isActive ? "bg-muted text-text rounded-full w-fit pr-6" : ""
               }`}
               onClick={() => navigate(item.route)}
             >
@@ -142,8 +142,8 @@ const Aside = ({ onLogout }) => {
         })}
       </div>
 
-      <div className="flex flex-col mt-2 bg-[#212121] p-2 rounded-lg h-[33vh]">
-        <p className="text-white text-xl mx-2 mt-4 ">Library</p>
+      <div className="flex flex-col mt-2 bg-muted p-2 rounded-lg h-[33vh]">
+        <p className="text-text text-xl mx-2 mt-4 ">Library</p>
         <div className="flex flex-col justify-between h-full">
           <div className="">
             {Library.map((item, index) => {
@@ -151,12 +151,10 @@ const Aside = ({ onLogout }) => {
               return (
                 <div
                   key={index}
-                  className={`flex items-center h-10 cursor-pointer hover:bg-black hover:rounded-full hover:w-fit hover:pr-6 ${
-                    isActive
-                      ? "bg-black text-white rounded-full w-fit pr-6"
-                      : ""
+                  className={`flex items-center h-10 cursor-pointer hover:bg-muted hover:rounded-full hover:w-fit hover:pr-6 ${
+                    isActive ? "bg-muted text-text rounded-full w-fit pr-6" : ""
                   }`}
-                  onClick={() => navigate(item.route)} 
+                  onClick={() => navigate(item.route)}
                 >
                   <item.icon className="mx-2" size={18} />
                   <p>{item.text}</p>
@@ -165,24 +163,23 @@ const Aside = ({ onLogout }) => {
             })}
           </div>
 
-          <Popover >
-            <PopoverTrigger className="bg-[#212121] border-none text-white">
-              <div className="flex items-center gap-2 cursor-pointer">
+          <Popover>
+            <PopoverTrigger className="bg-muted border-none ">
+              <div className="flex items-center gap-2 cursor-pointer ">
                 <Avatar>
                   <AvatarImage src="https://github.com/shadcn.png" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
-                <p>Miracle Labs</p>
+                <p className=" text-lg">Miracle Labs</p>
               </div>
             </PopoverTrigger>
-            <PopoverContent className="w-fit ml-5 flex flex-col-reverse gap-4">
-              {/* <Separator /> */}
+            <PopoverContent className="w-fit ml-5 flex flex-col-reverse gap-4 ">
               <div className="flex gap-2 items-center">
                 <Switch
                   checked={theme === "dark"}
                   onCheckedChange={(e) => setTheme(e ? "dark" : "light")}
                 />
-                <span>Switch Theme</span>
+                <span className="">Switch Theme</span>
               </div>
               <div
                 className="flex text-lg items-center gap-4 ml-3 hover:cursor-pointer"

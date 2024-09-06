@@ -10,8 +10,8 @@ const BackButton = () => {
         navigate(-1);
       }}
     >
-      <ChevronLeft className="bg-[#121212] rounded-full    p-1 group-hover:hidden" />
-      <ArrowLeft className="bg-[#121212] rounded-full    p-1 group-hover:block hidden" />
+      <ChevronLeft className="bg-background rounded-full    p-1 group-hover:hidden" />
+      <ArrowLeft className="bg-background rounded-full    p-1 group-hover:block hidden" />
     </div>
   );
 };

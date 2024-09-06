@@ -11,7 +11,7 @@ import { ThemeProvider } from "./components/theme-provider.jsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <App />
       </BrowserRouter>

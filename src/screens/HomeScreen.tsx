@@ -98,8 +98,8 @@ const HomeScreen = () => {
   console.log(playlist);
 
   return (
-    <div className="h-[87vh] w-full overflow-hidden flex transition-all bg-[#121212]">
-      <div className="bg-[#212121] w-full mt-2 mr-2 p-4 rounded-lg overflow-x-hidden">
+    <div className="h-[87vh] w-full overflow-hidden flex transition-all bg-background">
+      <div className="bg-muted w-full mt-2 mr-2 p-4 rounded-lg overflow-x-hidden">
         <div className="flex justify-between mt-6">
           <p className="text-white">Popular Artists</p>
           <p

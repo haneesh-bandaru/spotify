@@ -18,7 +18,7 @@ interface AlbumsCardProps {
 export default function AlbumsCard({ item }: AlbumsCardProps) {
   const navigate = useNavigate();
   return (
-    <Card className="bg-[#121212] min-h-64 group">
+    <Card className="bg-background min-h-64 group">
       <CardContent className="p-4">
         <img
           src={item.AlbumImage}
@@ -30,7 +30,7 @@ export default function AlbumsCard({ item }: AlbumsCardProps) {
       </CardContent>
       <CardContent className="flex justify-between group">
         <div className="">
-          <p className="text-white">{item.AlbumName}</p>
+          <p className="text-text">{item.AlbumName}</p>
           <p className="text-gray-400">{item.Release_Date.slice(0, 10)}</p>
         </div>
         <div

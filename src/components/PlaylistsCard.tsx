@@ -25,7 +25,7 @@ const PlaylistsCard: React.FC<PlaylistsCardProps> = ({ item }) => {
   const navigate = useNavigate();
   return (
     <div
-      className="p-4 rounded-lg bg-[#121212] text-white w-40 cursor-pointer"
+      className="p-4 rounded-lg bg-background text-text w-40 cursor-pointer"
       onClick={() => {
         navigate(`/playlist/${item?.Playlist_Name}`, {
           state: item?.Playlist_ID,

@@ -39,8 +39,10 @@ const PlaySongs = () => {
   const fetchTrackData = async (id) => {
     try {
       const response = await API.get.getSongsFromSaavan(id);
-      const lyr = await API.get.getLyricsFromSong(id);
-      setLyrics(lyr.data.data.lyrics);
+      try {
+        const lyr = await API.get.getLyricsFromSong(id);
+        setLyrics(lyr.data.data.lyrics);
+      } catch (error) {}
       return response.data.data[0];
     } catch (error) {
       console.error("Failed to fetch track data:", error);
@@ -133,8 +135,8 @@ const PlaySongs = () => {
 
   return (
     <div className="">
-      <footer className="h-20 bg-[#121212] border-t flex items-center justify-between px-4">
-        <div className="flex items-center gap-4 text-white">
+      <footer className="h-20 bg-background border-t flex items-center justify-between px-4">
+        <div className="flex items-center gap-4 text-text">
           <div className="w-14 h-14 bg-muted">
             {currentTrack?.image && (
               <img
@@ -223,7 +225,6 @@ const PlaySongs = () => {
                 audioRef.current.volume = value[0] / 100;
               }
             }}
-            
           />
           <Button
             variant="ghost"
@@ -237,7 +238,7 @@ const PlaySongs = () => {
       </footer>
 
       {showPlayingScreen && (
-        <div className=" fixed inset-0 bg-[#121212] z-50 flex flex-col">
+        <div className=" fixed inset-0 bg-background z-50 flex flex-col">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{
@@ -266,7 +267,7 @@ const PlaySongs = () => {
                 )}
               </div>
 
-              <h2 className="whitespace-pre-wrap break-words w-64 text-2xl font-bold text-white">
+              <h2 className="whitespace-pre-wrap break-words w-64 text-2xl font-bold text-text">
                 {currentTrack?.title || "Song Title"}
               </h2>
               <span className="text-muted-foreground">
