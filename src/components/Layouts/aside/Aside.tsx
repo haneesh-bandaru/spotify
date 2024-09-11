@@ -142,7 +142,7 @@ const Aside = ({ onLogout }) => {
         })}
       </div>
 
-      <div className="flex flex-col mt-2 bg-muted p-2 rounded-lg h-[33vh]">
+      <div className="flex flex-col mt-2 bg-muted p-2 rounded-lg h-[29vh]">
         <p className="text-text text-xl mx-2 mt-4 ">Library</p>
         <div className="flex flex-col justify-between h-full">
           <div className="">
@@ -170,17 +170,17 @@ const Aside = ({ onLogout }) => {
                   <AvatarImage src="https://github.com/shadcn.png" />
                   <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
-                <p className=" text-lg">Miracle Labs</p>
+                <p className=" text-lg text-white">Miracle Labs</p>
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-fit ml-5 flex flex-col-reverse gap-4 ">
-              <div className="flex gap-2 items-center">
+              {/* <div className="flex gap-2 items-center">
                 <Switch
                   checked={theme === "dark"}
                   onCheckedChange={(e) => setTheme(e ? "dark" : "light")}
                 />
                 <span className="">Switch Theme</span>
-              </div>
+              </div> */}
               <div
                 className="flex text-lg items-center gap-4 ml-3 hover:cursor-pointer"
                 // onClick={handleLogout}

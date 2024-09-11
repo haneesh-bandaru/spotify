@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import dummyImage from "/dummyImage.png";
 import usePlaybackStore from "@/store/PlayBackStore";
-import { Pause, Play, PlayCircle } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 
 const SearchScreen = () => {
   const location = useLocation();
